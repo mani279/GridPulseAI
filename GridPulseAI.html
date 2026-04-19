@@ -1,1 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Transformation Week - IoT</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --teal:   #009999;
+      --teal-d: #004d4d;
+      --teal-l: #e6f7f7;
+      --purple: #7b2d8b;
+      --blue:   #0077b6;
+      --amber:  #d97706;
+      --red:    #dc2626;
+      --green:  #16a34a;
+      --dark:   #1a1a2e;
+      --grey:   #6b7280;
+      --white:  #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--dark);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(26,26,46,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 56px;
+    }
+    .nav-logo { font-size: 12px; font-weight: 700; color: var(--teal); letter-spacing: 0.5px; white-space: nowrap; }
+    .nav-links { display: flex; gap: 4px; list-style: none; overflow-x: auto; }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links a {
+      color: rgba(255,255,255,0.6); text-decoration: none;
+      font-size: 11px; font-weight: 600; padding: 6px 12px;
+      border-radius: 20px; transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.08); }
+    .nav-progress { width: 120px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
+    .nav-progress-bar { height: 100%; background: linear-gradient(90deg, var(--teal), var(--purple)); width: 0%; transition: width 0.3s; }
+
+    /* ══ SLIDES ══ */
+    .slide {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 90px 48px 60px; position: relative; overflow: hidden;
+    }
+    .slide-inner { max-width: 1100px; width: 100%; position: relative; z-index: 2; }
+
+    .slide-hero    { background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 40%, #0d3333 100%); }
+    .slide-problem { background: linear-gradient(135deg, #1a0a0a 0%, #1a1a2e 50%, #1a0a2e 100%); }
+    .slide-solution{ background: linear-gradient(135deg, #0a1a0a 0%, #1a1a2e 50%, #0d3333 100%); }
+    .slide-tech    { background: linear-gradient(135deg, #0a1a2e 0%, #1a1a2e 50%, #0a0a1a 100%); }
+    .slide-design  { background: linear-gradient(135deg, #1a0a1a 0%, #1a1a2e 50%, #0a1a2e 100%); }
+    .slide-squads  { background: linear-gradient(135deg, #1a1a2e 0%, #0d1a3d 100%); }
+    .slide-outcome { background: linear-gradient(135deg, #0a1a0a 0%, #1a1a2e 50%, #0d3333 100%); }
+    .slide-dayplan { background: linear-gradient(135deg, #001a0d 0%, #1a1a2e 50%, #0a0a1a 100%); }
+
+    .bg-circle { position: absolute; border-radius: 50%; opacity: 0.06; pointer-events: none; }
+
+    /* ══ CHAPTER BANNER ══ */
+    .chapter-banner {
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem 3rem; text-align: center; position: relative; overflow: hidden;
+      background: linear-gradient(90deg, rgba(0,153,153,0.1), rgba(123,45,139,0.1));
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .chapter-banner::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0,153,153,0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,153,153,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .chapter-banner-inner { position: relative; z-index: 1; }
+    .chapter-banner .ch-num {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--teal); background: rgba(0,153,153,0.12);
+      border: 1px solid rgba(0,153,153,0.3);
+      padding: 0.3rem 0.9rem; border-radius: 999px; margin-bottom: 0.5rem;
+    }
+    .chapter-banner h2 { font-size: clamp(1.1rem, 2.5vw, 1.6rem); font-weight: 800; }
+    .chapter-banner h2 span { color: var(--teal); }
+    .chapter-banner p { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.35rem; }
+
+    /* ══ LABELS & HEADINGS ══ */
+    .slide-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 20px; padding: 6px 16px;
+      border: 1px solid rgba(0,153,153,0.3); border-radius: 20px;
+      background: rgba(0,153,153,0.08);
+    }
+    h1.hero-title { font-size: clamp(30px, 5vw, 52px); font-weight: 800; line-height: 1.15; margin-bottom: 20px; letter-spacing: -0.5px; }
+    h1.hero-title span { color: var(--teal); }
+    h2.slide-title { font-size: clamp(22px, 3.5vw, 36px); font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+    .hl-teal   { color: var(--teal); }
+    .hl-purple { color: #c77dff; }
+    .hl-amber  { color: #fbbf24; }
+    .hl-red    { color: #f87171; }
+    .hl-green  { color: #4ade80; }
+    .hl-blue   { color: #60a5fa; }
+    .slide-subtitle { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 36px; max-width: 720px; line-height: 1.75; }
+
+    /* ══ HERO ══ */
+    .hero-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+    .hero-badge { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 6px 16px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.75); }
+    .hero-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 40px; }
+    .hero-stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 22px; text-align: center; }
+    .hero-stat .stat-val { font-size: 28px; font-weight: 800; color: var(--teal); display: block; }
+    .hero-stat .stat-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ══ SCROLL HINT ══ */
+    .scroll-hint { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0.4; animation: bounce 2s infinite; }
+    .scroll-hint span { font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+    /* ══ CARDS ══ */
+    .card-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 32px; }
+    .card-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-top: 32px; }
+    .ov-card { border-radius: 14px; padding: 24px 20px; position: relative; overflow: hidden; transition: transform 0.25s; }
+    .ov-card:hover { transform: translateY(-3px); }
+    .ov-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .ov1  { background: rgba(0,119,182,0.1);  border: 1px solid rgba(0,119,182,0.2); }
+    .ov1::before  { background: linear-gradient(90deg, var(--blue),   #00b4d8); }
+    .ov2  { background: rgba(0,153,153,0.1);  border: 1px solid rgba(0,153,153,0.2); }
+    .ov2::before  { background: linear-gradient(90deg, var(--teal),   #00ccaa); }
+    .ov3  { background: rgba(123,45,139,0.1); border: 1px solid rgba(123,45,139,0.2); }
+    .ov3::before  { background: linear-gradient(90deg, var(--purple), #c77dff); }
+    .ov4  { background: rgba(217,119,6,0.1);  border: 1px solid rgba(217,119,6,0.2); }
+    .ov4::before  { background: linear-gradient(90deg, var(--amber),  #fbbf24); }
+    .ov5  { background: rgba(22,163,74,0.1);  border: 1px solid rgba(22,163,74,0.2); }
+    .ov5::before  { background: linear-gradient(90deg, var(--green),  #4ade80); }
+    .ov6  { background: rgba(220,38,38,0.1);  border: 1px solid rgba(220,38,38,0.2); }
+    .ov6::before  { background: linear-gradient(90deg, var(--red),    #f87171); }
+    .ov-card .ov-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+    .ov-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+    .ov-card p  { font-size: 11.5px; color: rgba(255,255,255,0.62); line-height: 1.65; }
+
+    /* ══ PILL ROW ══ */
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .pill { display: flex; align-items: center; gap: 7px; border-radius: 20px; padding: 7px 16px; font-size: 11.5px; font-weight: 600; }
+    .pill.teal  { background: rgba(0,153,153,0.12); border: 1px solid rgba(0,153,153,0.3);  color: #99e6e6; }
+    .pill.green { background: rgba(22,163,74,0.12);  border: 1px solid rgba(22,163,74,0.3);  color: #4ade80; }
+    .pill.red   { background: rgba(220,38,38,0.12);  border: 1px solid rgba(220,38,38,0.3);  color: #f87171; }
+    .pill.amber { background: rgba(217,119,6,0.12);  border: 1px solid rgba(217,119,6,0.3);  color: #fbbf24; }
+    .pill.blue  { background: rgba(0,119,182,0.12);  border: 1px solid rgba(0,119,182,0.3);  color: #60a5fa; }
+    .pill.purple{ background: rgba(123,45,139,0.12); border: 1px solid rgba(123,45,139,0.3); color: #c77dff; }
+
+    /* ══ KPI BADGE ROW ══ */
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .kpi-badge {
+      background: rgba(0,153,153,0.1); border: 1px solid rgba(0,153,153,0.25);
+      border-radius: 10px; padding: 10px 16px; font-size: 11px; font-weight: 700;
+      color: #99e6e6; display: flex; align-items: center; gap: 7px;
+    }
+    .kpi-badge .kb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+
+    /* ══ ARCH FLOW ══ */
+    .arch-flow {
+      display: flex; align-items: center;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 28px 20px; margin-top: 32px;
+      overflow-x: auto; flex-wrap: nowrap;
+    }
+    .arch-node { text-align: center; flex-shrink: 0; padding: 0 10px; }
+    .arch-node .an-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 10px; }
+    .arch-node .an-name  { font-size: 11px; font-weight: 700; }
+    .arch-node .an-label { font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+    .arch-arrow { font-size: 18px; color: rgba(255,255,255,0.2); padding: 0 4px; flex-shrink: 0; }
+
+    .arch-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 20px; }
+    .arch-card { border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); }
+    .arch-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--teal); }
+    .arch-card p  { font-size: 11.5px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+    .arch-card .ac-tag { display: inline-block; margin-top: 10px; background: rgba(0,153,153,0.15); border: 1px solid rgba(0,153,153,0.3); border-radius: 20px; padding: 3px 12px; font-size: 10px; font-weight: 700; color: var(--teal); }
+
+    /* ══ TOOL CARDS ══ */
+    .tool-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 24px; }
+    .tool-card {
+      border-radius: 12px; padding: 20px; position: relative; overflow: hidden;
+      transition: transform 0.25s;
+    }
+    .tool-card:hover { transform: translateY(-3px); }
+    .tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .tc1 { background: rgba(0,119,182,0.1);  border: 1px solid rgba(0,119,182,0.2); }
+    .tc1::before { background: linear-gradient(90deg, var(--blue), #00b4d8); }
+    .tc2 { background: rgba(123,45,139,0.1); border: 1px solid rgba(123,45,139,0.2); }
+    .tc2::before { background: linear-gradient(90deg, var(--purple), #c77dff); }
+    .tc3 { background: rgba(217,119,6,0.1);  border: 1px solid rgba(217,119,6,0.2); }
+    .tc3::before { background: linear-gradient(90deg, var(--amber), #fbbf24); }
+    .tool-card .tc-num { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.55; margin-bottom: 6px; }
+    .tool-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .tc1 h4 { color: #60a5fa; }
+    .tc2 h4 { color: #c77dff; }
+    .tc3 h4 { color: #fbbf24; }
+    .tool-card p { font-size: 11.5px; color: rgba(255,255,255,0.62); line-height: 1.6; }
+    .tool-card .tc-tag { display: inline-block; margin-top: 10px; border-radius: 20px; padding: 3px 12px; font-size: 10px; font-weight: 700; }
+    .tc1 .tc-tag { background: rgba(0,119,182,0.15); border: 1px solid rgba(0,119,182,0.3); color: #60a5fa; }
+    .tc2 .tc-tag { background: rgba(123,45,139,0.15); border: 1px solid rgba(123,45,139,0.3); color: #c77dff; }
+    .tc3 .tc-tag { background: rgba(217,119,6,0.15); border: 1px solid rgba(217,119,6,0.3); color: #fbbf24; }
+
+    /* ══ INFO BOXES ══ */
+    .info-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; position: relative; overflow: hidden; }
+    .info-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .ib-red::before    { background: linear-gradient(90deg, var(--red),    #f87171); }
+    .ib-amber::before  { background: linear-gradient(90deg, var(--amber),  #fbbf24); }
+    .ib-teal::before   { background: linear-gradient(90deg, var(--teal),   #00ccaa); }
+    .ib-purple::before { background: linear-gradient(90deg, var(--purple), #c77dff); }
+    .ib-blue::before   { background: linear-gradient(90deg, var(--blue),   #00b4d8); }
+    .info-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+    .info-box ul { list-style: none; padding: 0; }
+    .info-box ul li { font-size: 11.5px; color: rgba(255,255,255,0.65); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+    .info-box ul li:last-child { border-bottom: none; }
+    .info-box ul li::before { content: '→'; color: var(--teal); font-weight: 700; font-size: 10px; flex-shrink: 0; margin-top: 2px; }
+
+    /* ══ GUARDRAILS ══ */
+    .guardrail-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-top: 28px; }
+    .guardrail-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-left: 3px solid var(--teal); border-radius: 10px; padding: 16px 14px; }
+    .guardrail-item strong { display: block; font-size: 11px; color: var(--teal); margin-bottom: 6px; font-weight: 700; }
+    .guardrail-item span { font-size: 10.5px; color: rgba(255,255,255,0.55); line-height: 1.5; display: block; }
+
+    /* ══ DAY PLAN CARDS ══ */
+    .day-plan-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 32px; }
+    .day-plan-card { border-radius: 14px; padding: 24px; position: relative; overflow: hidden; }
+    .day-plan-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .dpc1 { background: linear-gradient(135deg, rgba(0,119,182,0.14), rgba(0,180,216,0.05)); border: 1px solid rgba(0,119,182,0.25); }
+    .dpc2 { background: linear-gradient(135deg, rgba(0,153,153,0.14), rgba(0,204,170,0.05)); border: 1px solid rgba(0,153,153,0.25); }
+    .dpc3 { background: linear-gradient(135deg, rgba(22,163,74,0.14),  rgba(74,222,128,0.05)); border: 1px solid rgba(22,163,74,0.25); }
+    .dpc1::before { background: linear-gradient(90deg, var(--blue),  #00b4d8); }
+    .dpc2::before { background: linear-gradient(90deg, var(--teal),  #00ccaa); }
+    .dpc3::before { background: linear-gradient(90deg, var(--green), #4ade80); }
+    .day-plan-card .dp-day   { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.55; margin-bottom: 6px; }
+    .day-plan-card .dp-title { font-size: 17px; font-weight: 800; margin-bottom: 14px; }
+    .dpc1 .dp-title { color: #60a5fa; }
+    .dpc2 .dp-title { color: #99e6e6; }
+    .dpc3 .dp-title { color: #4ade80; }
+    .day-plan-card ul { list-style: none; padding: 0; }
+    .day-plan-card ul li { font-size: 11.5px; color: rgba(255,255,255,0.68); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+    .day-plan-card ul li:last-child { border-bottom: none; }
+    .day-plan-card ul li::before { content: '✦'; font-size: 8px; flex-shrink: 0; margin-top: 3px; }
+    .dpc1 ul li::before { color: #60a5fa; }
+    .dpc2 ul li::before { color: #99e6e6; }
+    .dpc3 ul li::before { color: #4ade80; }
+
+    /* ══ SQUAD SECTION ══ */
+    .squad-block { margin-bottom: 52px; }
+    .squad-header {
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px 14px 0 0; padding: 20px 24px; border-bottom: none;
+    }
+    .squad-header .sq-icon { font-size: 2em; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sq1 .sq-icon { background: rgba(0,119,182,0.2);  border: 1px solid rgba(0,119,182,0.3); }
+    .sq2 .sq-icon { background: rgba(123,45,139,0.2); border: 1px solid rgba(123,45,139,0.3); }
+    .sq3 .sq-icon { background: rgba(217,119,6,0.2);  border: 1px solid rgba(217,119,6,0.3); }
+    .squad-header h3 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+    .squad-header p  { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .squad-header .sq-badge { margin-left: auto; padding: 6px 16px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; flex-shrink: 0; }
+    .sq1 .sq-badge { background: rgba(0,119,182,0.15);  border: 1px solid rgba(0,119,182,0.3);  color: #60a5fa; }
+    .sq2 .sq-badge { background: rgba(123,45,139,0.15); border: 1px solid rgba(123,45,139,0.3); color: #c77dff; }
+    .sq3 .sq-badge { background: rgba(217,119,6,0.15);  border: 1px solid rgba(217,119,6,0.3);  color: #fbbf24; }
+
+    /* ══ MEMBER TABLE ══ */
+    .member-table-wrap { border: 1px solid rgba(255,255,255,0.08); border-radius: 0 0 14px 14px; overflow: hidden; }
+    table.mtable { width: 100%; border-collapse: collapse; }
+    table.mtable thead tr { background: rgba(255,255,255,0.06); }
+    table.mtable thead th { padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.45); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    table.mtable thead th:first-child { min-width: 155px; }
+    table.mtable thead th:not(:first-child) { min-width: 210px; }
+    table.mtable tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    table.mtable tbody tr:last-child { border-bottom: none; }
+    table.mtable tbody tr:hover { background: rgba(255,255,255,0.03); }
+    table.mtable tbody td { padding: 16px; vertical-align: top; font-size: 12px; }
+    table.mtable tbody td:first-child { border-right: 1px solid rgba(255,255,255,0.06); }
+    .member-name { font-weight: 700; font-size: 13px; color: var(--white); margin-bottom: 3px; }
+    .member-role { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .day-cell ul { list-style: none; padding: 0; margin: 0; }
+    .day-cell ul li { font-size: 11.5px; color: rgba(255,255,255,0.65); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: flex-start; gap: 7px; line-height: 1.5; }
+    .day-cell ul li:last-child { border-bottom: none; }
+    .day-cell ul li::before { content: '→'; font-weight: 700; font-size: 10px; flex-shrink: 0; margin-top: 2px; }
+    .d1 .day-cell ul li::before { color: #60a5fa; }
+    .d2 .day-cell ul li::before { color: #4ade80; }
+    .d3 .day-cell ul li::before { color: #fbbf24; }
+    .day-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+    .dp1 { background: rgba(96,165,250,0.15);  border: 1px solid rgba(96,165,250,0.3);  color: #60a5fa; }
+    .dp2 { background: rgba(74,222,128,0.15);  border: 1px solid rgba(74,222,128,0.3);  color: #4ade80; }
+    .dp3 { background: rgba(251,191,36,0.15);  border: 1px solid rgba(251,191,36,0.3);  color: #fbbf24; }
+
+    /* ══ OUTCOME ══ */
+    .outcome-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 32px; }
+    .outcome-card { border-radius: 14px; padding: 26px 20px; text-align: center; position: relative; overflow: hidden; }
+    .outcome-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .oc1 { background: rgba(0,153,153,0.1);  border: 1px solid rgba(0,153,153,0.2); }
+    .oc1::before { background: linear-gradient(90deg, var(--teal),   #00ccaa); }
+    .oc2 { background: rgba(0,119,182,0.1);  border: 1px solid rgba(0,119,182,0.2); }
+    .oc2::before { background: linear-gradient(90deg, var(--blue),   #00b4d8); }
+    .oc3 { background: rgba(123,45,139,0.1); border: 1px solid rgba(123,45,139,0.2); }
+    .oc3::before { background: linear-gradient(90deg, var(--purple), #c77dff); }
+    .oc4 { background: rgba(22,163,74,0.1);  border: 1px solid rgba(22,163,74,0.2); }
+    .oc4::before { background: linear-gradient(90deg, var(--green),  #4ade80); }
+    .outcome-card .oc-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+    .outcome-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .outcome-card p  { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+
+    /* ══ CLOSING QUOTE ══ */
+    .closing-quote { margin-top: 40px; text-align: center; padding: 32px 48px; background: linear-gradient(135deg, rgba(0,153,153,0.1), rgba(123,45,139,0.1)); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; }
+    .closing-quote p { font-size: 17px; font-weight: 700; line-height: 1.75; color: rgba(255,255,255,0.9); }
+    .closing-quote span { color: var(--teal); }
+
+    /* ══ CALLOUT ══ */
+    .callout {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: rgba(0,153,153,0.08); border: 1px solid rgba(0,153,153,0.25);
+      border-left: 4px solid var(--teal);
+      border-radius: 0 12px 12px 0; padding: 16px 20px; margin-top: 24px;
+    }
+    .callout.amber-callout { background: rgba(217,119,6,0.08); border-color: rgba(217,119,6,0.25); border-left-color: var(--amber); }
+    .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .callout-text { font-size: 12.5px; color: rgba(255,255,255,0.75); line-height: 1.7; }
+    .callout-text strong { color: var(--white); }
+
+    /* ══ FADE IN ══ */
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .fd1 { transition-delay: 0.1s; } .fd2 { transition-delay: 0.2s; }
+    .fd3 { transition-delay: 0.3s; } .fd4 { transition-delay: 0.4s; }
+    .fd5 { transition-delay: 0.5s; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 900px) {
+      .hero-stats    { grid-template-columns: repeat(2,1fr); }
+      .card-grid-3, .arch-cards, .tool-grid, .day-plan-grid { grid-template-columns: 1fr; }
+      .card-grid-2   { grid-template-columns: 1fr; }
+      .guardrail-grid { grid-template-columns: repeat(2,1fr); }
+      .outcome-grid  { grid-template-columns: repeat(2,1fr); }
+      .nav-links     { display: none; }
+      .slide         { padding: 80px 24px 48px; }
+      table.mtable   { display: block; overflow-x: auto; }
+    }
+    @media (max-width: 600px) {
+      .outcome-grid   { grid-template-columns: 1fr; }
+      .guardrail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="nav-logo">⚡ GridPulse AI  · 3-Day Plan</div>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#design">Design Choices</a></li>
+    <li><a href="#dayplan">3-Day Plan</a></li>
+    <li><a href="#squads">Squads</a></li>
+    <li><a href="#outcome">Outcome</a></li>
+  </ul>
+  <div class="nav-progress"><div class="nav-progress-bar" id="progressBar"></div></div>
+</nav>
+
+<!-- ████ SLIDE 1 — HERO ████ -->
+<section class="slide slide-hero" id="hero">
+  <div class="bg-circle" style="width:600px;height:600px;background:var(--teal);top:-200px;right:-200px;"></div>
+  <div class="bg-circle" style="width:400px;height:400px;background:var(--purple);bottom:-150px;left:-150px;"></div>
+  <div class="slide-inner">
+    <div class="slide-label fade-in">⚡ DGM · GridPulse AI  · 3-Day Plan</div>
+    <h1 class="hero-title fade-in fd1">
+      <span></span>GridPulse AI </span>
+    </h1>
+    <p class="slide-subtitle fade-in fd2">
+      LangChain + Qwen + GLM-5 · 3-Day Implementation Plan &amp; Team Execution Document.<br/>
+      DGM remains the source of truth · LangChain orchestrates tools · AI explains in plain language.
+    </p>
+    <div class="hero-badges fade-in fd3">
+      <span class="hero-badge">🔗 LangChain Orchestration</span>
+      <span class="hero-badge">🧭 GLM-5 Intent Routing</span>
+      <span class="hero-badge">🧠 Qwen Narration</span>
+      <span class="hero-badge">🔒 Siemens SDC LLM Gateway</span>
+      <span class="hero-badge">📊 DGM KPI Source of Truth</span>
+      <span class="hero-badge">🗄️ Vector DB Context Retrieval</span>
+      <span class="hero-badge">💬 Conversational UI</span>
+    </div>
+    <div class="hero-stats fade-in fd4">
+      <div class="hero-stat"><span class="stat-val">3</span><span class="stat-label">Squads</span></div>
+      <div class="hero-stat"><span class="stat-val">14</span><span class="stat-label">Team Members</span></div>
+      <div class="hero-stat"><span class="stat-val">3</span><span class="stat-label">Days to Demo</span></div>
+      <div class="hero-stat"><span class="stat-val">5</span><span class="stat-label">DGM KPIs in Scope</span></div>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><span>↓</span></div>
+</section>
+
+<!-- ████ CHAPTER — NON-TECHNICAL OVERVIEW ████ -->
+<div class="chapter-banner" id="problem">
+  <div class="chapter-banner-inner">
+    <div class="ch-num">📋 Non-Technical Overview</div>
+    <h2>Context, Problem &amp; <span>Solution</span></h2>
+    <p>For management and business stakeholders — no jargon, just clarity</p>
+  </div>
+</div>
+
+<!-- SLIDE 2 — CONTEXT & PROBLEM -->
+<section class="slide slide-problem">
+  <div class="bg-circle" style="width:500px;height:500px;background:var(--red);top:-150px;left:-150px;"></div>
+  <div class="slide-inner">
+    <div class="slide-label fade-in" style="color:#f87171;border-color:rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);">🚨 Context &amp; Problem</div>
+    <h2 class="slide-title fade-in fd1">
+      DGM already monitors the grid.<br/><span class="hl-red">But operators still interpret it manually.</span>
+    </h2>
+    <p class="slide-subtitle fade-in fd2">
+      DGM already provides grid monitoring KPIs and a user experience for viewing Distribution
+      station KPIs. However, operators still need to interpret KPIs manually and translate them
+      into "what happened / why / what next" — especially during incidents and shift handovers.
+    </p>
+
+    <!-- KPI scope -->
+    <div class="fade-in fd2">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:10px;">5 DGM KPIs Currently in Scope</div>
+      <div class="kpi-row">
+        <div class="kpi-badge"><div class="kb-dot"></div>Congestion</div>
+        <div class="kpi-badge"><div class="kb-dot"></div>Power Factor</div>
+        <div class="kpi-badge"><div class="kb-dot"></div>Current Unbalance</div>
+        <div class="kpi-badge"><div class="kb-dot"></div>Voltage Deviation</div>
+        <div class="kpi-badge"><div class="kb-dot"></div>Infeed Detection</div>
+      </div>
+    </div>
+
+    <div class="card-grid-3 fade-in fd3" style="margin-top:28px;">
+      <div class="ov-card ov6">
+        <span class="ov-icon">📊</span>
+        <h3>KPIs Exist, Understanding Takes Time</h3>
+        <p>KPIs exist in DGM, but understanding and decision making still takes time. Operators must manually interpret what each value means.</p>
+      </div>
+      <div class="ov-card ov6">
+        <span class="ov-icon">🗣️</span>
+        <h3>No Plain-Language Guidance</h3>
+        <p>Operators want quick, plain-language explanations and guidance — not raw numbers. Current tools don't provide this conversationally.</p>
+      </div>
+      <div class="ov-card ov6">
+        <span class="ov-icon">🧠</span>
+        <h3>Knowledge Hard to Reuse</h3>
+        <p>Knowledge from similar past cases is difficult to reuse quickly — requires searching manuals, notes, and tickets manually.</p>
+      </div>
+    </div>
+
+    <div class="callout fade-in fd4">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-text">
+        <strong>Key Challenge:</strong> Keep answers grounded in DGM KPI facts (avoid hallucinations),
+        provide a fast conversational experience without changing how DGM computes KPIs, and add
+        optional knowledge retrieval without mixing it with KPI truth.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3 — SOLUTION -->
+<section class="slide slide-solution" id="solution">
+  <div class="bg-circle" style="width:500px;height:500px;background:var(--teal);bottom:-150px;right:-150px;"></div>
+  <div class="slide-inner">
+    <div class="slide-label fade-in">✅ The Solution</div>
+    <h2 class="slide-title fade-in fd1">
+      A conversational assistant<br/><span class="hl-teal">built on top of DGM</span>
+    </h2>
+    <p class="slide-subtitle fade-in fd2">
+      DGM remains the "source of truth" for KPI values and KPI logic. LangChain orchestrates
+      tools — one to fetch KPIs from DGM, another to retrieve relevant text context from a
+      Vector DB. GLM-5 routes intent; Qwen narrates and explains in plain language.
+    </p>
+
+    <div class="card-grid-3 fade-in fd3">
+      <div class="ov-card ov2">
+        <span class="ov-icon">🏛️</span>
+        <h3>DGM = Source of Truth</h3>
+        <p>DGM remains the authoritative source for all KPI values and KPI logic. No recomputation in this PoC — facts come directly from DGM.</p>
+      </div>
+      <div class="ov-card ov2">
+        <span class="ov-icon">🔗</span>
+        <h3>LangChain Orchestrates Tools</h3>
+        <p>LangChain builds a tool-calling chain: fetch KPIs from DGM, retrieve context from Vector DB, and optionally generate clarification questions.</p>
+      </div>
+      <div class="ov-card ov2">
+        <span class="ov-icon">💬</span>
+        <h3>GLM-5 Routes · Qwen Explains</h3>
+        <p>GLM-5 handles intent routing and structured extraction. Qwen narrates and explains in plain language that any operator can understand.</p>
+      </div>
+    </div>
+
+    <div class="callout fade-in fd4">
+      <div class="callout-icon">💡</div>
+      <div class="callout-text">
+        <strong>Outcome:</strong> Operators can ask <em>"Why is this feeder red?"</em> and get:
+        <strong> KPI facts (from DGM)</strong> + <strong>AI explanation</strong> + <strong>recommended next action</strong>.
+        Knowledge retrieval improves speed to resolution, while KPI truth remains governed by DGM.
+      </div>
+    </div>
+
+    <div class="pill-row fade-in fd4">
+      <div class="pill teal">✅ DGM KPI facts — source of truth</div>
+      <div class="pill teal">✅ LangChain tool orchestration</div>
+      <div class="pill green">✅ Vector DB for manuals &amp; SOPs</div>
+      <div class="pill green">✅ Plain-language Qwen narration</div>
+      <div class="pill purple">✅ GLM-5 intent routing</div>
+      <div class="pill amber">✅ No KPI recomputation in PoC</div>
+    </div>
+  </div>
+</section>
+
+<!-- ████ CHAPTER — TECHNICAL OVERVIEW ████ -->
+<div class="chapter-banner" id="architecture">
+  <div class="chapter-banner-inner">
+    <div class="ch-num">🔧 Technical Overview</div>
+    <h2>Architecture &amp; <span>Design Decisions</span></h2>
+    <p>LangChain · GLM-5 · Qwen · Vector DB · DGM KPI Source of Truth</p>
+  </div>
+</div>
+
+<!-- SLIDE 4 — ARCHITECTURE -->
+<section class="slide slide-tech">
+  <div class="bg-circle" style="width:500px;height:500px;background:var(--blue);top:-150px;right:-150px;"></div>
+  <div class="slide-inner">
+    <div class="slide-label fade-in" style="color:#60a5fa;border-color:rgba(0,119,182,0.3);background:rgba(0,119,182,0.08);">🏗️ Updated Architecture</div>
+    <h2 class="slide-title fade-in fd1">
+      DGM KPI = Truth.<br/><span class="hl-blue">Vector DB = Context. LLM = Explanation.</span>
+    </h2>
+    <p class="slide-subtitle fade-in fd2">
+      LangChain orchestrates a tool-calling chain. GLM-5 classifies intent and extracts
+      structured JSON. Tools fetch KPI facts from DGM and retrieve text context from Vector DB.
+      Qwen narrates the final operator-friendly response.
+    </p>
+
+    <!-- Flow bar -->
+    <div class="arch-flow fade-in fd3">
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(255,255,255,0.06);">🧑‍💻</div>
+        <div class="an-name">Operator</div>
+        <div class="an-label">Natural Language</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(0,119,182,0.15);">🌐</div>
+        <div class="an-name">UI</div>
+        <div class="an-label">DGM-aligned</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(34,197,94,0.15);">⚙️</div>
+        <div class="an-name">FastAPI</div>
+        <div class="an-label">Backend Gateway</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(168,85,247,0.15);">🧭</div>
+        <div class="an-name">GLM-5</div>
+        <div class="an-label">Intent Router</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(0,153,153,0.15);">🔗</div>
+        <div class="an-name">LangChain</div>
+        <div class="an-label">Tool Orchestration</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(0,119,182,0.15);">📊</div>
+        <div class="an-name">DGM KPI Tool</div>
+        <div class="an-label">Source of Truth</div>
+      </div>
+      <div class="arch-arrow">+</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(123,45,139,0.15);">🗄️</div>
+        <div class="an-name">Vector DB Tool</div>
+        <div class="an-label">Manuals / SOPs</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(22,163,74,0.15);">🧠</div>
+        <div class="an-name">Qwen</div>
+        <div class="an-label">Narrator</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-icon" style="background:rgba(217,119,6,0.15);">🔒</div>
+        <div class="an-name">SDC Gateway</div>
+        <div class="an-label">Governed Access</div>
+      </div>
+    </div>
+
+    <!-- LangChain Tools -->
+    <div style="margin-top:28px;" class="fade-in fd3">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:14px;">LangChain Tool-Calling Chain</div>
+      <div class="tool-grid">
+        <div class="tool-card tc1">
+          <div class="tc-num">Tool 1</div>
+          <h4>Fetch KPI Facts from DGM</h4>
+          <p>Fetches pre-computed KPI values directly from DGM by asset and time filter. DGM remains the authoritative source — no recomputation.</p>
+          <span class="tc-tag">kpi_fetch_tool</span>
+        </div>
+        <div class="tool-card tc2">
+          <div class="tc-num">Tool 2</div>
+          <h4>Retrieve Context from Vector DB</h4>
+          <p>Retrieves relevant text from manuals, SOPs, and past incident summaries. Complements — never overrides — DGM KPI facts.</p>
+          <span class="tc-tag">vector_retrieval_tool</span>
+        </div>
+        <div class="tool-card tc3">
+          <div class="tc-num">Tool 3 · Optional</div>
+          <h4>Generate Clarification Question</h4>
+          <p>When time range or asset is missing from the operator's query, generates a targeted clarification question before proceeding.</p>
+          <span class="tc-tag">clarification_tool</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LLM Roles -->
+    <div class="arch-cards fade-in fd4" style="margin-top:20px;">
+      <div class="arch-card">
+        <h4>🧭 GLM-5 — Control Plane</h4>
+        <p>Intent classification, routing, and structured JSON extraction. GLM-5 (labeled GLM 5.1 internally) handles the control plane with fallback strategies in place.</p>
+        <span class="ac-tag">Router Chain</span>
+      </div>
+      <div class="arch-card">
+        <h4>🧠 Qwen — Experience Plane</h4>
+        <p>Narration and operator-friendly explanation. Recommended model: qwen-3.5-27b (generally available). Qwen only narrates provided KPI facts — no hallucination.</p>
+        <span class="ac-tag">Narrator Chain</span>
+      </div>
+      <div class="arch-card">
+        <h4>🔒 SDC LLM Gateway</h4>
+        <p>All model calls routed through Siemens SDC LLM Gateway for governed access, ACP compliance, auditability, and model fallback support.</p>
+        <span class="ac-tag">Governed Access</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5 — DESIGN CHOICES -->
+<section class="slide slide-design" id="design">
+  <div class="bg-circle" style="width:400px;height:400px;background:var(--purple);top:-100px;left:-100px;"></div>
+  <div class="slide-inner">
+    <div class="slide-label fade-in" style="color:#c77dff;border-color:rgba(123,45,139,0.3);background:rgba(123,45,139,0.08);">🔍 Design Choices &amp; Guardrails</div>
+    <h2 class="slide-title fade-in fd1">
+      Non-negotiable rules.<br/><span class="hl-purple">Grounded. Governed. Reliable.</span>
+    </h2>
+    <p class="slide-subtitle fade-in fd2">
+      Every architectural decision ensures KPI truth stays with DGM, retrieved context
+      complements but never overrides facts, and all LLM calls are governed and auditable.
+    </p>
+
+    <div class="card-grid-2 fade-in fd3">
+      <div class="info-box ib-teal">
+        <h4>🏛️ Core Rule — Non-Negotiable</h4>
+        <ul>
+          <li>KPI values come from DGM's existing KPI computation — no recomputation in this PoC</li>
+          <li>5 KPIs in scope: Congestion, Power Factor, Current Unbalance, Voltage Deviation, Infeed Detection</li>
+          <li>LangChain tool fetches KPI facts; Qwen only narrates what it receives</li>
+          <li>Retrieved text from Vector DB must never overwrite KPI numeric truth</li>
+          <li>Guard checks enforce separation of KPI facts vs. retrieved context</li>
+        </ul>
+      </div>
+      <div class="info-box ib-purple">
+        <h4>🗄️ Vector DB — Context Only</h4>
+        <ul>
+          <li>Used ONLY for text retrieval: manual excerpts, SOPs, incident summaries, operator notes</li>
+          <li>NOT used for KPI numeric truth — DGM owns that</li>
+          <li>Retrieval content complements, does not override, DGM KPI facts</li>
+          <li>Response clearly separates "KPI facts" vs "AI explanation" vs "retrieved context"</li>
+          <li>Any vector DB implementation is valid for this PoC</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout amber-callout fade-in fd3" style="margin-top:20px;">
+      <div class="callout-icon">⚡</div>
+      <div class="callout-text">
+        <strong>Reliability Notes:</strong> GLM-5 (internally labeled GLM 5.1) has ongoing availability tuning —
+        fallback strategy designed: <strong>GLM-5 slow/unavailable → Qwen in strict JSON mode</strong>.
+        Recommended default narrator: <strong>qwen-3.5-27b</strong> (generally available).
+      </div>
+    </div>
+
+    <div class="guardrail-grid fade-in fd4">
+      <div class="guardrail-item">
+        <strong>🔒 Data Classification</strong>
+        <span>ACP-2 only via LLM Gateway. ACP-3 strictly prohibited.</span>
+      </div>
+      <div class="guardrail-item">
+        <strong>📦 Data Minimization</strong>
+        <span>Only pre-computed DGM KPI facts passed to LLMs — never raw telemetry.</span>
+      </div>
+      <div class="guardrail-item">
+        <strong>📝 Auditability</strong>
+        <span>Prompts and responses logged with appropriate redaction.</span>
+      </div>
+      <div class="guardrail-item">
+        <strong>🚧 Controlled Access</strong>
+        <span>Only whitelisted LangChain tool calls permitted.</span>
+      </div>
+      <div class="guardrail-item">
+        <strong>🔍 Transparency</strong>
+        <span>LLM responses explicitly state when data is missing or unavailable.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ████ CHAPTER — 3-DAY PLAN ████ -->
+<div class="chapter-banner" id="dayplan">
+  <div class="chapter-banner-inner">
+    <div class="ch-num">📅 Execution Plan</div>
+    <h2>3-Day <span>Delivery Roadmap</span></h2>
+    <p>Foundation → Implementation → Integration &amp; Demo</p>
+  </div>
+</div>
+
+<section class="slide slide-dayplan" style="min-height:auto;padding:70px 48px;">
+  <div class="slide-inner">
+    <div class="slide-label fade-in">🗓️ High-Level 3-Day Roadmap</div>
+    <h2 class="slide-title fade-in fd1">Three days.<br/><span class="hl-green">One working system.</span></h2>
+    <div class="day-plan-grid fade-in fd2">
+      <div class="day-plan-card dpc1">
+        <div class="dp-day">Day 1</div>
+        <div class="dp-title">Foundation</div>
+        <ul>
+          <li>Finalize updated architecture: DGM KPI = truth, Vector DB = context, LLM = explanation</li>
+          <li>Define LangChain tool contracts (KPI fetch + retrieval + clarification)</li>
+          <li>Define KPI fact schema aligned with DGM KPI semantics</li>
+          <li>API contracts &amp; UI wireframes agreed across squads</li>
+          <li>Define fallback policy: GLM-5 → Qwen strict JSON mode</li>
+        </ul>
+      </div>
+      <div class="day-plan-card dpc2">
+        <div class="dp-day">Day 2</div>
+        <div class="dp-title">Implementation</div>
+        <ul>
+          <li>DGM KPI client wrapper + KPI facts bundle endpoint</li>
+          <li>LangChain Router chain (GLM-5) + tool wiring</li>
+          <li>Vector DB retrieval integration</li>
+          <li>Qwen narration chain with grounding constraints</li>
+          <li>UI screens with separated KPI facts / explanation / context panels</li>
+        </ul>
+      </div>
+      <div class="day-plan-card dpc3">
+        <div class="dp-day">Day 3</div>
+        <div class="dp-title">Integration &amp; Demo</div>
+        <ul>
+          <li>End-to-end: question → intent JSON → KPI fetch → retrieval → answer</li>
+          <li>Fallback handling verified (GLM-5 → Qwen routing)</li>
+          <li>Guard checks: retrieved text never overwrites KPI truth</li>
+          <li>UI polish + demo choreography</li>
+          <li>Stabilization, regression testing &amp; sign-off</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ████ CHAPTER — SQUADS ████ -->
+<div class="chapter-banner" id="squads">
+  <div class="chapter-banner-inner">
+    <div class="ch-num">👥 Team Structure</div>
+    <h2>3 Squads · <span>14 Members · Every Day</span></h2>
+    <p>Backend &amp; DGM Integration · LangChain &amp; AI Routing · UI/UX DGM-Aligned Experience</p>
+  </div>
+</div>
+
+<section class="slide slide-squads">
+  <div class="slide-inner">
+    <div class="slide-label fade-in">📋 Day-Wise Task Breakdown — All Members</div>
+    <h2 class="slide-title fade-in fd1">
+      Three squads.<br/><span class="hl-blue">Every member. Every day.</span>
+    </h2>
+    <p class="slide-subtitle fade-in fd2">
+      Clear ownership and day-by-day task breakdown for all 14 team members across
+      Core Backend &amp; DGM Integration, LangChain Orchestration &amp; AI, and UI/UX squads.
+    </p>
+
+    <!-- ══ SQUAD 1 ══ -->
+    <div class="squad-block sq1 fade-in fd3">
+      <div class="squad-header">
+        <div class="sq-icon">🏗️</div>
+        <div>
+          <h3>The Engine — Core Backend, DGM KPI Integration &amp; DevOps</h3>
+          <p>Lead: Tejas P &nbsp;·&nbsp; Members: Tejas P, Akshata, Akshaya, Tanvi, Akshay</p>
+        </div>
+        <div class="sq-badge">5 Members</div>
+      </div>
+      <div class="member-table-wrap">
+        <table class="mtable">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th><div class="day-pill dp1">Day 1 — Foundation</div></th>
+              <th><div class="day-pill dp2">Day 2 — Build</div></th>
+              <th><div class="day-pill dp3">Day 3 — Polish &amp; Demo</div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="member-name">Tejas P</div>
+                <div class="member-role">Architect / Lead</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Define updated architecture: DGM KPI = truth, Vector DB = context, LLM = explanation</li>
+                <li>Define tool contracts for LangChain tools (KPI fetch + retrieval)</li>
+                <li>Define fallback policy: GLM-5 → Qwen strict JSON mode</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Review integration of DGM KPI client + Vector DB retrieval plumbing</li>
+                <li>Validate grounding rules: Qwen must only narrate provided KPI facts</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Architecture walkthrough + demo technical narrative</li>
+                <li>Verify all services stable and logging correctly</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Akshata</div>
+                <div class="member-role">Backend Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Implement "DGM KPI client" wrapper interface (fetch KPI facts by asset + time filter)</li>
+                <li>Define KPI fact schema matching DGM KPIs</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Implement backend endpoint returning "KPI facts bundle" for LangChain tool use</li>
+                <li>Add validation for missing inputs (asset / time)</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Add caching if needed + finalize tests for KPI bundle correctness</li>
+                <li>Performance tune KPI facts endpoint</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Akshaya</div>
+                <div class="member-role">Backend Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Define "facts bundle" format: KPI values + status + time range + asset metadata</li>
+                <li>Create mapping rules aligned with DGM KPI semantics (no recomputation)</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Implement "context packaging": combine KPI facts + retrieved text snippets (clearly separated fields)</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Hardening: ensure retrieved text never overwrites KPI truth</li>
+                <li>Add guard checks for fact/context separation</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Tanvi</div>
+                <div class="member-role">Junior Backend</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Define Pydantic / DTO schemas: Intent JSON, KPI facts bundle, Retrieval results</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Unit tests for schema validation + error handling</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Bug fixes + documentation: how to add a new KPI field without changing LLM prompts</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Akshay</div>
+                <div class="member-role">DevOps</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Stand up local demo environment: backend + chosen Vector DB + config templates</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Add observability: request logs, tool latency metrics, fallback counters</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Demo stability setup + simple reset scripts (clear vector index / seed data)</li>
+              </ul></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ SQUAD 2 ══ -->
+    <div class="squad-block sq2 fade-in fd3">
+      <div class="squad-header">
+        <div class="sq-icon">🤖</div>
+        <div>
+          <h3>The Brain — LangChain Orchestration, AI Routing &amp; API Integration</h3>
+          <p>Lead: Mayur &nbsp;·&nbsp; Members: Mayur, Veena, Rugved, Madhukar</p>
+        </div>
+        <div class="sq-badge">4 Members</div>
+      </div>
+      <div class="member-table-wrap">
+        <table class="mtable">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th><div class="day-pill dp1">Day 1 — Foundation</div></th>
+              <th><div class="day-pill dp2">Day 2 — Build</div></th>
+              <th><div class="day-pill dp3">Day 3 — Polish &amp; Demo</div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="member-name">Mayur</div>
+                <div class="member-role">Architect / Lead</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Define LangChain chain design: Router chain (GLM-5) → Tools → Narrator chain (Qwen)</li>
+                <li>Define prompts and output constraints (strict JSON for routing)</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Validate end-to-end: question → intent JSON → KPI fetch tool → retrieval tool → final answer</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Final integration sign-off + demo flow ownership</li>
+                <li>Oversee compliance checks</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Veena</div>
+                <div class="member-role">Backend Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Implement LangChain Router step using GLM-5 (intent extraction to JSON)</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Wire tools into chain: call KPI facts tool + Vector retrieval tool</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Add fallback: if GLM-5 slow/unavailable, route with Qwen in strict JSON mode</li>
+                <li>Final end-to-end testing of chat</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Rugved</div>
+                <div class="member-role">Full Stack Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Define response contract for UI: sections "KPI facts", "Explanation", "Sources / Context used"</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Implement streaming response from chain to UI (if applicable)</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Fix integration gaps, polish error states (missing asset / time)</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Madhukar</div>
+                <div class="member-role">Junior Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Create API documentation + sample payloads for: /chat, /kpi-facts, /retrieve</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Manual test checklist: 10 queries covering KPI lookups, explanation, retrieval, and clarifications</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Regression testing + demo readiness checklist</li>
+              </ul></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ SQUAD 3 ══ -->
+    <div class="squad-block sq3 fade-in fd3">
+      <div class="squad-header">
+        <div class="sq-icon">🎨</div>
+        <div>
+          <h3>The Voice — UI / UX · DGM-Aligned Experience</h3>
+          <p>Lead: Ganraj &nbsp;·&nbsp; Members: Ganraj, Damodar, Aditya, Arya, Lester</p>
+        </div>
+        <div class="sq-badge">5 Members</div>
+      </div>
+      <div class="member-table-wrap">
+        <table class="mtable">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th><div class="day-pill dp1">Day 1 — Foundation</div></th>
+              <th><div class="day-pill dp2">Day 2 — Build</div></th>
+              <th><div class="day-pill dp3">Day 3 — Polish &amp; Demo</div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="member-name">Ganraj</div>
+                <div class="member-role">Full Stack / Lead</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Implement UI shell and DGM-aligned widget placement (chat + brief)</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Integrate UI with /chat endpoint — display KPI facts + explanation separately</li>
+                <li>Refine state management for real-time updates</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>End-to-end UI polish + demo choreography</li>
+                <li>Own UI demo for stakeholder presentation</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Damodar</div>
+                <div class="member-role">UX Designer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Wireframes for chat + daily brief showing "KPI facts (from DGM)" and "AI explanation" clearly separated</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Define operator-friendly labels for the 5 DGM KPIs</li>
+                <li>Simplify UX text for AI explanations &amp; system messages</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>UX polish + clarity review</li>
+                <li>Final visual consistency check</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Aditya</div>
+                <div class="member-role">Full Stack Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Build KPI facts panel UI (shows the 5 DGM KPIs + time filter)</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Build "sources / context used" panel (retrieved SOP / manual snippets)</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>UI performance and bug fixes</li>
+                <li>Ensure panels clearly separate facts vs. context</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Arya</div>
+                <div class="member-role">Junior Engineer</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>UI components + consistent styling</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Chat interaction improvements (loading states, streaming effect)</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>UI testing and fixes across browsers / devices</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="member-name">Lester</div>
+                <div class="member-role">Full Stack · Flex</div>
+              </td>
+              <td class="day-cell d1"><ul>
+                <li>Support blockers across all squads</li>
+              </ul></td>
+              <td class="day-cell d2"><ul>
+                <li>Assist with brief screen / integration</li>
+              </ul></td>
+              <td class="day-cell d3"><ul>
+                <li>Demo contingency fixes — ready to troubleshoot or present</li>
+              </ul></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ████ FINAL OUTCOME ████ -->
+<div class="chapter-banner" id="outcome">
+  <div class="chapter-banner-inner">
+    <div class="ch-num">🏁 Final Outcome</div>
+    <h2>End of <span>Day 3</span></h2>
+    <p>A demo-ready, grounded, compliant DGM conversational intelligence system</p>
+  </div>
+</div>
+
+<section class="slide slide-outcome">
+  <div class="bg-circle" style="width:500px;height:500px;background:var(--green);bottom:-150px;left:-150px;"></div>
+  <div class="bg-circle" style="width:300px;height:300px;background:var(--teal);top:-100px;right:-100px;"></div>
+  <div class="slide-inner">
+    <div class="slide-label fade-in" style="color:#4ade80;border-color:rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);">🏁 Delivered by End of Day 3</div>
+    <h2 class="slide-title fade-in fd1">
+      Demo-ready. Grounded.<br/><span class="hl-green">Compliant.</span>
+    </h2>
+    <p class="slide-subtitle fade-in fd2">
+      By the end of Day 3, the team will have a fully integrated conversational assistant
+      built with LangChain — KPI facts from DGM, context from Vector DB, GLM-5 routing,
+      Qwen narration, and a UI that clearly separates facts from explanation from context.
+    </p>
+    <div class="outcome-grid fade-in fd3">
+      <div class="outcome-card oc1">
+        <span class="oc-icon">📊</span>
+        <h4>DGM KPI Facts — Source of Truth</h4>
+        <p>LangChain fetches KPI facts directly from DGM. Congestion, Power Factor, Current Unbalance, Voltage Deviation, Infeed Detection — governed and accurate.</p>
+      </div>
+      <div class="outcome-card oc2">
+        <span class="oc-icon">🗄️</span>
+        <h4>Vector DB Context Retrieval</h4>
+        <p>Relevant manual excerpts, SOPs, and past incident summaries retrieved and shown separately — complementing, never overriding, DGM KPI truth.</p>
+      </div>
+      <div class="outcome-card oc3">
+        <span class="oc-icon">💬</span>
+        <h4>Conversational AI — Plain Language</h4>
+        <p>"Why is this feeder red?" → KPI facts + AI explanation + recommended next action. GLM-5 routes intent; Qwen narrates with full fallback support.</p>
+      </div>
+      <div class="outcome-card oc4">
+        <span class="oc-icon">✅</span>
+        <h4>Demo-Ready &amp; Compliant</h4>
+        <p>UI clearly separates KPI facts vs. AI explanation vs. retrieved context. All LLM calls governed via Siemens SDC Gateway. ACP-compliant. Auditable.</p>
+      </div>
+    </div>
+    <div class="closing-quote fade-in fd4">
+      <p>
+        <span>DGM KPI = Truth · Vector DB = Context · LLM = Explanation</span><br/>
+        Operators ask. LangChain orchestrates. Qwen explains.<br/>
+        <span>Grounded. Governed. Demo-ready in 3 days.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ JS ══ -->
+<script>
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.body.scrollHeight - window.innerHeight;
+    document.getElementById('progressBar').style.width = ((scrollTop / docHeight) * 100) + '%';
+  });
+
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  fadeEls.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
